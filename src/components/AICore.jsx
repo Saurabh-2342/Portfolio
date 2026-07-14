@@ -68,12 +68,14 @@ export default function AICore({ heroRef, themeKey, finePointer }) {
       const l2 = new THREE.PointLight(pal.a3, 6, 30); l2.position.set(-5, -2, 3); scene.add(l2)
       const l3 = new THREE.PointLight(pal.a2, 5, 30); l3.position.set(0, 4, -4); scene.add(l3)
 
-      // Radius that roughly covers the outer wireframe shell + a little margin.
-      // On narrow/portrait screens the horizontal FOV shrinks a lot relative to
-      // the vertical FOV, so without this the core would poke past the left
-      // and right edges of the canvas. Pulling the camera back keeps the whole
-      // shape inside view on any aspect ratio.
-      const FIT_RADIUS = 2.35
+      // Radius that covers the main wireframe shell (the faint outer ring can
+      // bleed past the edges a little — it's subtle and low-opacity). On
+      // narrow/portrait screens the horizontal FOV shrinks a lot relative to
+      // the vertical FOV, so without some pull-back the core would poke past
+      // the left/right edges; capping the distance keeps it from shrinking
+      // too much on the narrowest phones.
+      const FIT_RADIUS = 1.8
+      const MAX_DIST = 9
       const vFov = (cam.fov * Math.PI) / 180
       const resize = () => {
         const w = hero.clientWidth, h = hero.clientHeight
@@ -81,7 +83,7 @@ export default function AICore({ heroRef, themeKey, finePointer }) {
         const aspect = w / h
         cam.aspect = aspect
         const minDist = FIT_RADIUS / (Math.tan(vFov / 2) * Math.min(aspect, 1))
-        cam.position.z = Math.max(6, minDist)
+        cam.position.z = Math.min(MAX_DIST, Math.max(6, minDist))
         cam.updateProjectionMatrix()
       }
       resize()
