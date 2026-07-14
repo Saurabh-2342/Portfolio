@@ -33,9 +33,11 @@ export default function App() {
     r.setProperty('--a1-rgb', t.a1rgb); r.setProperty('--a2-rgb', t.a2rgb); r.setProperty('--a3-rgb', t.a3rgb)
   }, [])
 
-  // only build the 3D core on capable, motion-friendly, non-tiny screens
+  // build the 3D core everywhere except when the user prefers reduced motion —
+  // it auto-rotates on its own, so touch/mobile devices still get it without
+  // the pointer-parallax tilt (see finePointer gating inside AICore).
   useEffect(() => {
-    setShowCore(!REDUCE_MOTION && window.innerWidth >= 768)
+    setShowCore(!REDUCE_MOTION)
   }, [])
 
   return (

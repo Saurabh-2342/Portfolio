@@ -11,7 +11,7 @@ export default function Hero({ heroRef, showCore, finePointer, themeKey }) {
     <section id="top" className="hero" ref={heroRef}>
       {showCore && (
         <Suspense fallback={null}>
-          <AICore heroRef={heroRef} themeKey={themeKey} />
+          <AICore heroRef={heroRef} themeKey={themeKey} finePointer={finePointer} />
         </Suspense>
       )}
 

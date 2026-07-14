@@ -6,7 +6,7 @@ const hex = (s) => parseInt(s.slice(1), 16)
 // The floating "AI core" behind the hero. three.js is imported dynamically so
 // it ships as its own chunk and never blocks first paint. Skipped entirely on
 // touch devices / reduced-motion (App decides whether to mount this).
-export default function AICore({ heroRef, themeKey }) {
+export default function AICore({ heroRef, themeKey, finePointer }) {
   const canvasRef = useRef(null)
   const ctx = useRef(null) // holds the mutable three.js scene handles
 
@@ -19,8 +19,9 @@ export default function AICore({ heroRef, themeKey }) {
       const canvas = canvasRef.current
       const hero = heroRef.current || canvas.parentElement
 
-      const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true })
-      renderer.setPixelRatio(Math.min(devicePixelRatio, 2))
+      const isSmallScreen = innerWidth < 700
+      const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: !isSmallScreen })
+      renderer.setPixelRatio(Math.min(devicePixelRatio, isSmallScreen ? 1.5 : 2))
       const scene = new THREE.Scene()
       const cam = new THREE.PerspectiveCamera(45, 1, 0.1, 100)
       cam.position.set(0, 0, 6)
@@ -46,7 +47,7 @@ export default function AICore({ heroRef, themeKey }) {
       group.add(wire2)
 
       // fewer particles on small screens
-      const N = innerWidth < 700 ? 450 : 900
+      const N = isSmallScreen ? 450 : 900
       const pos = new Float32Array(N * 3)
       for (let i = 0; i < N; i++) {
         const r = 2.2 + Math.random() * 2.6
@@ -76,9 +77,11 @@ export default function AICore({ heroRef, themeKey }) {
       resize()
       window.addEventListener('resize', resize)
 
+      // pointer-parallax tilt only makes sense with a mouse; on touch devices
+      // the core just auto-rotates in place with no hover reaction.
       let tx = 0, ty = 0
       const onMove = (e) => { tx = e.clientX / innerWidth - 0.5; ty = e.clientY / innerHeight - 0.5 }
-      window.addEventListener('mousemove', onMove, { passive: true })
+      if (finePointer) window.addEventListener('mousemove', onMove, { passive: true })
 
       // pause rendering when the hero scrolls off-screen
       let heroVisible = true
@@ -108,7 +111,7 @@ export default function AICore({ heroRef, themeKey }) {
       cleanup = () => {
         cancelAnimationFrame(raf)
         window.removeEventListener('resize', resize)
-        window.removeEventListener('mousemove', onMove)
+        if (finePointer) window.removeEventListener('mousemove', onMove)
         io.disconnect()
         renderer.dispose()
         geo.dispose()
