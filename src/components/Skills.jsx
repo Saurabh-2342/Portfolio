@@ -33,7 +33,7 @@ export default function Skills() {
     <section id="skills" className="section section--wide">
       <Reveal className="section-head" style={{ marginBottom: 22 }}>
         <span className="mono idx">02</span>
-        <h2>Capabilities</h2>
+        <h2>Skills</h2>
       </Reveal>
       <Reveal as="p" style={{ color: 'rgba(255,255,255,.5)', maxWidth: 520, marginBottom: 52, fontSize: 15, lineHeight: 1.6 }}>
         Four domains I build across. Hover a discipline to explore the toolkit.
